@@ -3,6 +3,9 @@ import React, { useState, useReducer } from "react";
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
 import Button from "../UI/Button/Button";
+//derinving isValid key value and storing in emailIsValid and passwordIsValid constant i.e alias assignment instead of value assignment
+// const { isValid: emailIsValid } = emailState;
+// const { isValid: passwordIsValid } = passwordState;
 
 const emailReducer = (state, action) => {
   if (action.type === "User_Input") {
@@ -17,14 +20,27 @@ const emailReducer = (state, action) => {
 };
 
 const passwordReducer = (state, action) => {
-  if (action.type === "Password_Input") {
+  if (action.type === "User_Input") {
     return { value: action.val, isValid: action.val.trim().length > 6 };
   }
-  if (action.type === "Password_Blur") {
+  if (action.type === "Input_Blur") {
     return { value: state.value, isValid: state.value.trim().length > 6 };
   }
   return { value: "", isValid: false };
 };
+
+// useEffect(() => {
+//   const identifier = setTimeout(() => {
+//     console.log("Checking form validity!");
+//     setFormIsValid(emailState.isValid && passwordState.isValid);
+//   }, 500);
+//   return () => {
+//     console.log("CLEANUP");
+//     clearTimeout(identifier);
+//   };
+// }, [emailState, passwordState]);
+//used emailIsValid...because it will make no rerender of above effect only run on validity change not on value change
+//say in password checking validity and cleanup re-runs only till its validity not changed to valid.
 
 const Login = (props) => {
   const [formIsValid, setFormIsValid] = useState(false);
@@ -41,14 +57,12 @@ const Login = (props) => {
 
   const emailChangeHandler = (event) => {
     dispatchEmail({ type: "User_Input", val: event.target.value });
-    setFormIsValid(
-      event.target.value.includes("@") && passwordState.value.trim().length > 6
-    );
+    setFormIsValid(emailState.isValid && passwordState.isValid);
   };
 
   const passwordChangeHandler = (event) => {
-    dispatchPassword({ type: "Password_Input", val: event.target.value });
-    setFormIsValid(emailState.isValid && event.target.value.trim().length > 6);
+    dispatchPassword({ type: "User_Input", val: event.target.value });
+    setFormIsValid(emailState.isValid && passwordState.isValid);
   };
 
   const validateEmailHandler = () => {
@@ -56,7 +70,7 @@ const Login = (props) => {
   };
 
   const validatePasswordHandler = () => {
-    dispatchPassword({ type: "Password_Blur" });
+    dispatchPassword({ type: "Input_Blur" });
   };
 
   const submitHandler = (event) => {
@@ -77,6 +91,7 @@ const Login = (props) => {
             type="email"
             id="email"
             value={emailState.value}
+            autoComplete="off"
             onChange={emailChangeHandler}
             onBlur={validateEmailHandler}
           />
