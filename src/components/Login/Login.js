@@ -1,11 +1,8 @@
-import React, { useState, useReducer } from "react";
-
+import React, { useState, useReducer, useContext } from "react";
+import AuthContext from "../../context/auth-context";
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
 import Button from "../UI/Button/Button";
-//derinving isValid key value and storing in emailIsValid and passwordIsValid constant i.e alias assignment instead of value assignment
-// const { isValid: emailIsValid } = emailState;
-// const { isValid: passwordIsValid } = passwordState;
 
 const emailReducer = (state, action) => {
   if (action.type === "User_Input") {
@@ -29,20 +26,8 @@ const passwordReducer = (state, action) => {
   return { value: "", isValid: false };
 };
 
-// useEffect(() => {
-//   const identifier = setTimeout(() => {
-//     console.log("Checking form validity!");
-//     setFormIsValid(emailState.isValid && passwordState.isValid);
-//   }, 500);
-//   return () => {
-//     console.log("CLEANUP");
-//     clearTimeout(identifier);
-//   };
-// }, [emailState, passwordState]);
-//used emailIsValid...because it will make no rerender of above effect only run on validity change not on value change
-//say in password checking validity and cleanup re-runs only till its validity not changed to valid.
-
-const Login = (props) => {
+const Login = () => {
+  const contx = useContext(AuthContext);
   const [formIsValid, setFormIsValid] = useState(false);
 
   const [emailState, dispatchEmail] = useReducer(emailReducer, {
@@ -75,7 +60,7 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(emailState.value, passwordState.value);
+    contx.onLogin(emailState.value, passwordState.value);
   };
 
   return (
